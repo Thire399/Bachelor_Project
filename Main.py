@@ -1,3 +1,9 @@
+'''
+Code to Run the training scrip.
+
+Remember to change path for the data set and where the images and the model is saved.
+'''
+
 """Imports"""
 import matplotlib.pyplot as plt
 import os
@@ -70,13 +76,11 @@ def Get_Files(directory):
         for f in filenames:
                 TempPath.append(os.path.abspath(os.path.join(dirpath, f)))
     return TempPath
+
 def create_pathces (Images, W, H, step_size):
     '''
     Takes in an Image of shape (4 x W X H)\n
-    Does not handle 4 channels yet, so I trash the 4th. channel\n
-    This should be superior compared to a costum implementation, as it should not use more memory when creating views.\n
-    Just not as robost or costumizeable, if using own implementation\n
-    Now handels overlap
+    Now handels overlap.
     '''
     All_patches = []
     Images = np.asarray(Images)
@@ -160,42 +164,6 @@ def Reconstruct(ndArr_X, Ori_PatchShape, N_img):
 
     return np.asarray(Back_to_origianl)
 
-def Evalf_test(model, loss, X, Y):
-    '''
-    For evaluating the model on Validation data
-    '''
-    out = model(X)
-    loss_out = loss(out, Y)
-    for i in range(out.shape[0]):
-        temp = np.asarray(out[i].cpu().detach().numpy())
-        temp = temp[0]
-        im = Image.fromarray((temp*255).astype(np.uint8))
-        im = im.save(f'Bachelor_Project/Data/out/Test/{i}_test.tif')
-    return loss_out.item()
-
-def To_Tuple(X, Y):
-    '''
-    Takes in X data and Y labels, and creates an array with tuble (x, y)
-    for each element in the input data
-    Not used right now.
-    '''
-    out = []
-    for i in range(X.shape[0]):
-        out.append((X[i], Y[i]))
-    return np.asarray(out)
-
-def From_Tuple(input):
-    '''
-    Takes in an Array of tuples, and output set X and set Y.
-    Not used right now
-    '''
-    X = []
-    Y = []
-    for i in range(input.shape[0]):
-        X.append(input[i][0])
-        Y.append(input[i][1])
-    return np.asarray(X), np.asarray(Y)
-
 def PRAUC(pred, Target, ep):
     '''
     Takes in output from model and Target labels,
@@ -228,9 +196,9 @@ def PRAUC(pred, Target, ep):
     plt.xlabel ('Recall')
     plt.ylabel('Precision')
     plt.title('Precision Recall curve')
-    #plt.show(block=False)
-    #plt.pause(3)
-    #plt.close()
+    plt.show(block=False)
+    plt.pause(3)
+    plt.close()
     plt.show()
     return bestT
 
@@ -289,52 +257,6 @@ def UpScale(img, scale):
     out = scaler(img)
     return out
 
-def DownScale(img, originalshape):
-    '''
-    As we use interpolate we can feed all images at once.
-    so img is a set of all images.
-    Original shape is the original shape which to downscale to. Must be a shape.
-    '''
-    print(f'\nInput size: {img.shape}')
-    out = F.interpolate(img, (originalshape[2], originalshape[3]), mode = 'nearest')
-    print(f'Output size{out.shape}')
-    return out
-
-    '''
-    generateNewData handles scaling the data and Data augmentation.
-    Input:
-        - Images :
-        - n_scale : number of classes
-        - Patch_size : Tuple of (H, W)
-        - If_Val : Bool Validation/Test set
-    ----------------
-    Returns:
-        - Scaled X data
-        - Labels for sacled data
-    '''
-    X_out = []
-    y_scale_out = []
-    scale = 0
-    N_Images = []
-    #Use equal number of datapoint for each scale to avoid class imbalance
-    scale = 1
-    if If_Val == True:
-        for i in range(n_scale):
-            if (scale == 1):
-                Normal = Transform(Images, None, If_trainX= True)
-                #double the first class to level out some class imbalance
-                temp = UpScale(Normal, scale = scale)
-
-            else:
-                temp = UpScale(Images, scale = scale)
-            X_out.append(temp)
-            y_scale_out.append(scale)
-            N_Images.append(temp.shape[0])
-            scale +=1
-
-    #print(len(X_out), X_out[0].shape, X_out[1].shape)
-    return X_out, y_scale_out, N_Images
-
 #Figure out smart way for this in a function
 #Or simply call inside trainloop function before loop
 def ScalePatch(X_data, Y_labels, W, H, step_size):
@@ -377,44 +299,6 @@ def ScalePatch(X_data, Y_labels, W, H, step_size):
 
     return X_out, y_scale_True, n_patches_shape
 
-def ReconstructSSL(ndArr_X, N_imgs, N_patch_shape):
-    '''
-    *THIS IS NOT USED; AND HAS NOT BEEN TESTED FOR THE PIPELINE*
-    Note this is a modified version. Has the same funcitonality as the origianl
-    Reconstruct, but adds the functionality of doing it for different shapes.
-    Reconstructs the d-dimensional array given to the "Deconstruct" function\\
-    This is then reconstructed in the original patch array shape
-    '''
-    #Creates corrects size matrix with
-    idx = 0
-    Back_to_origianl = []
-    N_img = N_imgs[idx]
-    N_patch = N_patch_shape[idx]
-    old_index = 0
-    for N in range(N_img):
-        Ori_PatchShape = N_patch
-        N_Image = np.zeros(Ori_PatchShape)
-        #print('This is N', N)
-        Nr_image = N * N_Image.shape[1] * N_Image.shape[2]
-        for i in range (N_Image.shape[1]):
-            for j in range (N_Image.shape[2]):
-                index = (Nr_image + (i*N_Image.shape[1])+j) + old_index
-                #print('Index: ', index)
-                N_Image[0, i, j] = ndArr_X[index]
-        Back_to_origianl.append(N_Image)
-
-        if (index == N_img*N_patch[2]*N_patch[3]) and (idx < len(N_img)-1):
-            old_index += index
-            N = 0
-            #Update the
-            idx += 1
-            N_img = N_imgs[idx]
-            N_patch = N_patch[idx]
-        #or do if N_img == N-1 : ,
-    #print('Reconstructed: ', len(Back_to_origianl), 'Image patch arrays')
-
-    return np.asarray(Back_to_origianl)
-
 def transform(images):
     image = torch.from_numpy(images)
     image = image.unsqueeze(0).int()
@@ -441,7 +325,7 @@ def Train_loop_SSL(model, Train_loader, Val_loader,
     Val_loss = []
     DL = Models.diceloss()
     print(f'Choosen model: {str(name)}')
-    Model_Name = f'/home/thire399/Documents/Bachelor_Project/Data/out/SSLUNet/Model/{str(name)[15:-2]}'
+    Model_Name = f'Some_Save_Path/{str(name)[15:-2]}' #Add path to save model.
 
     early_stopping = Models.EarlyStopping( patience=patience,
                         verbose=True, delta = delta, path =
@@ -476,7 +360,6 @@ def Train_loop_SSL(model, Train_loader, Val_loader,
             loss = loss_function(Pred['fg_feats'], (Target).to(device))
             BatchVal_loss.append(loss.item())
             if batch % 30 == 0:
-                #print(Target)
                 print(4*' ','===> Validation: [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                     batch * len(Data), len(Val_loader.dataset),
                     100. * batch / len(Val_loader),
@@ -518,7 +401,7 @@ def Train_loop_SSL(model, Train_loader, Val_loader,
         temp = np.asarray(images[i])
         temp = temp[0]
         im = Image.fromarray((temp*255).astype(np.uint8))
-        im = im.save(f'/home/thire399/Documents/Bachelor_Project/Data/out/SSLUNet/DSC_{i+1}.tif')
+        im = im.save(f'Some_Save_Path/DSC_{i+1}.tif') # Add path
 
     #-------------------- Test data -----------------------
     Out_patchesTest = []
@@ -551,21 +434,13 @@ def Train_loop_SSL(model, Train_loader, Val_loader,
         temp = np.asarray(images[i])
         temp = temp[0]
         im = Image.fromarray((temp*255).astype(np.uint8))
-        im = im.save(f'/home/thire399/Documents/Bachelor_Project/Data/out/SSLUNet/Test/{i+1}_Test.tif')
+        im = im.save(f'Some_Save_Path/Test/{i+1}_Test.tif') #Add path
 
     return Train_loss, Val_loss, np.mean(BatchTest_loss)
 
-#Train Data
 #Loading data in.
-DataDirPath = '/home/thire399/Documents/Bachelor_Project/Data/MonuSeg'
+DataDirPath = 'Some_Data_Path/MonuSeg' # Add path
 DataPath = Get_Files(DataDirPath)
-'''
-# ----------------------------------------------
-#Train Data
-Train_Data = torch.load(DataPath[1])
-X_train, Y_train = Train_Data
-X_train = swapaxes(X_train)
-'''
 
 #Validation Data
 Validation_Data = torch.load(DataPath[2])
@@ -577,7 +452,7 @@ Y_Val =  Y_Val.unsqueeze(1)
 Patches_Val_Y = create_pathces(Y_Val, W, H, step_size = step_size)
 
 # Test Data
-#no need to scale test data, we use the attention mapping.
+#no need to scale test data. Only we use the attention mapping.
 Test_Data = torch.load(DataPath[0])
 X_test, Y_test = Test_Data
 X_test = swapaxes(X_test)
@@ -589,13 +464,13 @@ Patches_test_Y = create_pathces(Y_test, 1024, 1024, step_size = 1024)
 Y_Test_Data = Deconstruct(Patches_test_Y)
 # ---------------------------------------------
 
-Train_set = Models.DataSet(data_dir = '/home/thire399/Documents/Bachelor_Project/Data/CostumDataSetTrain', transform = transform)
+Train_set = Models.DataSet(data_dir = 'Some_Data_Path/CostumDataSetTrain', transform = transform) #Add path
 Train_loader = torch.utils.data.DataLoader(Train_set,
                         batch_size=batch_size,
                         shuffle=True)
 
 
-Val_set = Models.DataSet(data_dir = '/home/thire399/Documents/Bachelor_Project/Data/CostumDataSetVal', transform = transform )
+Val_set = Models.DataSet(data_dir = 'Some_Data_Path/CostumDataSetVal', transform = transform ) #Add path
 Val_loader = torch.utils.data.DataLoader(Val_set,
                         batch_size=batch_size,
                         shuffle=False)
@@ -607,11 +482,6 @@ Test_set = torch.utils.data.TensorDataset(torch.tensor(X_Test_Data),
 Test_loader = torch.utils.data.DataLoader(Test_set,
                         batch_size=2,
                         shuffle=False)
-'''
-for idx, (Data, Target) in enumerate(Val_loader):
-    print(f'{idx}:    Data Shape: {Data.shape} DataType {Data.dtype}       Target {Target.shape}       Target = {Target} DataType {Target.dtype} ')
-    break
-'''
 
 model = ChoseModel(num_S_Class, flag = True, num_class = num_class)
 

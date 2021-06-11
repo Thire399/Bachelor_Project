@@ -103,8 +103,8 @@ class DataSet(torch.utils.data.Dataset):
         label = self.Target[index]
         img_path = Load_all_files_dir(f'{self.data_dir}/Images')
         image = cv2.imread(img_path[index], cv2.IMREAD_GRAYSCALE)
-
         # cv2.CV_LOAD_IMAGE_GRAYSCALE flag is needed to let it know it is grayscaled
+
         if self.transform is not None:
             image = self.transform(image)
         return image, label
@@ -121,7 +121,6 @@ class Block(nn.Module):
 
     def forward(self, x):
         return self.relu(self.conv2( self.relu( self.conv1(x))))
-        #return self.relu(self.BN (self.conv2( self.relu(self.Drop(self.BN(self.conv1(x)))))))
 
 #This is the downsampling step/ the encoding step. We transform?
 class Encoder(nn.Module):
@@ -131,12 +130,12 @@ class Encoder(nn.Module):
         self.pool       = nn.MaxPool2d(2)
 
     def forward(self, x):
-        ftrs = []
+        Features = []
         for block in self.enc_blocks:
             x = block(x)
-            ftrs.append(x)
+            Features.append(x)
             x = self.pool(x)
-        return ftrs
+        return Features
 
 #This is the decoder, or where we upsample again, / putting everything together
 class Decoder(nn.Module):
@@ -270,7 +269,7 @@ class ScaleUNet_MLP(nn.Module):
     '''
     Combines the pretrained Resnet 34, and an attention network.
     '''
-    def __init__(self, num_S_Class, num_class = 3):
+    def __init__(self, num_S_Class, flag, num_class = 3):
         super().__init__()
         self.AttentionNet   = UNet((1, 4, 8, 16, 32),(32, 16, 8, 4), num_class)
         self.Conv1x1        = nn.Conv2d(2, num_class, 1, 1, 0) #only used if attention only

@@ -48,34 +48,12 @@ def Get_Files(directory, num_files = 10):
                 TempPath.append(os.path.abspath(os.path.join(dirpath, f)))
     return TempPath
 
-'''
-DataDirPath = '/home/thire399/Documents/Bachelor_Project/Data/MonuSeg'
-
-DataPath = Get_Files(DataDirPath)
-print(DataPath)
-Data = torch.load(DataPath[1])
-
-#Data = torch.transpose(Data[0], 1,-1)
-#Data = torch.transpose(Data, 2,-1)
-Data = Data[0].detach().numpy()
-#images = [0, 7, 10]
-images = [0]
-for i in images:
-    print(i, Data[i].shape)
-    im = Image.fromarray((Data[i]*255).astype(np.uint8))
-    #im = im.convert('RGB')
-    #im = im.save(f'/home/thire399/Documents/Bachelor_Project/testImages/{i+1}_Test_AOriginal.tif')
-    #im = im.save(f'/home/thire399/Documents/Bachelor_Project/testImages/{i+1}_Test_AOriginal.tif')
-    im = im.save(f'/home/thire399/Documents/Bachelor_Project/{i}_trainImage.tif')
-'''
 def saveimage(LossOrNot):
     if LossOrNot == False:
         Name = 'Useless'
-        path = Load_all_files_dir(f'/home/thire399/Documents/Bachelor_Project/{Name}')
+        path = Load_all_files_dir(f'Some_Save_Path/{Name}') #Add path
         fig = plt.figure(figsize=(12, 12))
         fig.tight_layout()
-
-        #important to change! Controls layout of the figures
 
         # ax enables access to manipulate each of subplots
         temp = []
@@ -87,6 +65,7 @@ def saveimage(LossOrNot):
             if len(im.shape) == 2:
                 im = np.expand_dims(im,-1)
             temp.append(im)
+        #Next iteration, do a better job of this. Give it as input?
         '''
         columns = 5
         rows = 3
@@ -95,6 +74,7 @@ def saveimage(LossOrNot):
                 'Original test\n image 8', 'Baseline test\n image 8', 'ScaleNet test\n image 8', 'ScaleUNet test\n image 8', 'Ground truth test\n image 8',
                 'Original test\n image 11', 'Baseline test\n image 11', 'ScaleNet test\n image 11', 'ScaleUNet test\n image 11', 'Ground truth test\n image 11'] #update names for SSLNet
         '''
+        #important to change! Controls layout of the figures
         columns = 4
         rows = 3
         notBW = [0, 4, 8]
@@ -113,11 +93,11 @@ def saveimage(LossOrNot):
             else:
                 plt.tight_layout(pad=0.1, w_pad=0.1, h_pad=0.1)
                 plt.imshow(temp[i], cmap = 'gray' )
-        plt.savefig(f'/home/thire399/Documents/Bachelor_Project/{Name}', dpi = 400, bbox_inches='tight')
+        plt.savefig(f'Some_Save_Path/{Name}', dpi = 400, bbox_inches='tight') #Add path
 
         plt.show()
     else:
-        path = Load_all_files_dir(f'/home/thire399/Documents/Bachelor_Project/LossPrEpoch')
+        path = Load_all_files_dir(f'Some_Save_Path/LossPrEpoch')#Add path
         fig = plt.figure(figsize=(15, 15))
 
         #important to change! Controls layout of the figures
@@ -143,13 +123,13 @@ def saveimage(LossOrNot):
             plt.axis('off')
             plt.imshow(temp[i])
 
-        plt.savefig('/home/thire399/Documents/Bachelor_Project/LossPrEpoch', dpi = 400, bbox_inches='tight')
+        plt.savefig('Some_Save_Path/LossPrEpoch', dpi = 400, bbox_inches='tight') #Add path
         plt.show()
 
 def SaveTrain():
 
     Name = 'PatchPlot'
-    path = Load_all_files_dir(f'/home/thire399/Documents/Bachelor_Project/{Name}')
+    path = Load_all_files_dir(f'Some_Save_Path/{Name}')#Add path
     fig = plt.figure(figsize=(12, 12))
     fig.tight_layout()
 
@@ -178,15 +158,14 @@ def SaveTrain():
         ax[i].yaxis.set_visible(False) # set title
         plt.tight_layout(pad=0.1, w_pad=0.1, h_pad=0.1)
         plt.imshow(temp[i], cmap = 'gray')
-    plt.savefig(f'/home/thire399/Documents/Bachelor_Project/Scales.png', bbox_inches='tight')
+    plt.savefig(f'Some_Save_Path/Scales.png', bbox_inches='tight')#Add path
 
     plt.show()
 
 #saveimage(LossOrNot = True)
 #SaveTrain()
 
-
-im = Image.open(f'/home/thire399/Documents/Bachelor_Project/Data/out/SSLUNet/Test/8_Test.tif')
+im = Image.open(f'Some_Save_Path//Test/8_Test.tif')#Add path
 im = np.asarray(im)
 im = np.expand_dims(im,0)
 im = np.expand_dims(im,0)
@@ -236,4 +215,4 @@ x = Deconstruct(x)
 for i in range(len(x)):
     temp = np.asarray(x[i])
     im = Image.fromarray((temp*255).astype(np.uint8))
-    im = im.save(f'/home/thire399/Documents/Bachelor_Project/Data/out/{i+1}.tif')
+    im = im.save(f'Some_Save_Path/out/{i+1}.tif')#Add path

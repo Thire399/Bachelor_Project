@@ -1,5 +1,4 @@
 """Imports"""
-
 import os
 import numpy as np
 import torch
@@ -11,16 +10,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 import patchify as Pf
 import os
-
 from collections import Counter
-
 print('Done with imports')
-
 """# Data Loading functions
 
 """
 ### Defining Data augmentation functions
 def Get_Files(directory, num_files = 10):
+
     '''
     < Description > \n
         Gets the abs path of all files in a given directory
@@ -40,6 +37,7 @@ def Get_Files(directory, num_files = 10):
         for f in filenames:
                 TempPath.append(os.path.abspath(os.path.join(dirpath, f)))
     return TempPath
+
 def create_pathces (Images, W, H, step_size):
     '''
     Takes in an Image of shape (4 x W X H)\n
@@ -129,7 +127,6 @@ def Reconstruct(ndArr_X, Ori_PatchShape, N_img):
     #print('Reconstructed: ', len(Back_to_origianl), 'Image patch arrays')
 
     return np.asarray(Back_to_origianl)
-
 
 def Transform(X, Y, If_trainX = False):
     '''
@@ -321,16 +318,14 @@ num_S_Class = 5 #Number of scales
 # Patch parameters
 step_size = 256
 W, H = (256, 256)
-
 '''
-Note: No need to normalize the data as it is alreay normalized
 ------------------------------------------------------------------------------
 '''
 
 # ----------------------------------------------
 #Train Data
 #Loading data in.
-DataDirPath = '/home/thire399/Documents/Bachelor_Project/Data/MonuSeg'
+DataDirPath = 'Some_Save_Path/MonuSeg'#Add path
 DataPath = Get_Files(DataDirPath)
 
 # ----------------------------------------------
@@ -347,7 +342,7 @@ labels = generateNewData(X_train,
                                 num_S_Class,
                                 W, H,
                                 step_size = step_size,
-                                SavePath = '/home/thire399/Documents/Bachelor_Project/Data/CostumDataSetTrain',
+                                SavePath = 'Some_Save_Path/CostumDataSetTrain',#Add path
                                 IfVal = False)
 print(labels.shape, labels.unique())
 
@@ -358,7 +353,7 @@ labels = generateNewData(X_Val,
                                 num_S_Class,
                                 W, H,
                                 step_size = step_size,
-                                SavePath = '/home/thire399/Documents/Bachelor_Project/Data/CostumDataSetVal',
+                                SavePath = 'Some_Save_Path/CostumDataSetVal',#Add path
                                 IfVal = True)
 print(labels.shape, labels.unique())
 

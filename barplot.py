@@ -3,7 +3,7 @@ import os
 import numpy as np
 from matplotlib.lines import Line2D
 
-
+#Accuracies from each model, for each image in the validation set and test set.
 UNet_baselineVal = [0.8280853218052792, 0.8616764803818968, 0.7881481048475437, 0.8774189028681184,
                      0.7484981445395754, 0.7788797735652151, 0.7954308516011963, 0.750257264641587, 0.7686544766841935]
 
@@ -37,9 +37,7 @@ ScaleNetVal_mean = np.mean(ScaleNetVal)
 
 ScaleNetTest_mean = np.mean(ScaleNetTest)
 
-
 labels = ['Val', 'Test', 'Val','Test','Val', 'Test']
-#legend = ['UNet Baseline', 'ScaleNet', 'ScaleUNet', 'Image Accuracy']
 x_pos = [0, 2, 4, 6, 8, 10]
 custom_lines = [Line2D([0], [0], color= 'blue', lw=4),
                 Line2D([0], [0], color='green', lw=4),
@@ -102,7 +100,6 @@ ax.bar(10, ScaleUNetTest_mean, 1,
                 error_kw=dict(elinewidth=1, ecolor='red'))
 
 
-
 legend = ax.legend(loc = 'upper right', frameon = 1)
 frame = legend.get_frame()
 frame.set_facecolor('white')
@@ -113,5 +110,5 @@ ax.set_ylabel('Accuracy')
 ax.yaxis.grid(True)
 ax.set_title('Loss for each image')
 plt.tight_layout()
-plt.savefig(f'/home/thire399/Documents/Bachelor_Project/Barplt')
+plt.savefig(f'Some_Save_Path/Barplt') #Add path
 plt.show()
