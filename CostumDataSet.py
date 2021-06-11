@@ -60,9 +60,6 @@ def Recreate_image(image, Ori_shape):
     '''
     Takes a bunch of patches, and puts them together to the original shape of the original image. REWRITE
     '''
-    #print('Recreate images')
-    #print('Input shape: ', image.shape)
-    #print('output shape: ', Ori_shape)
     temp = []
     for i in range (image.shape[0]):
         temp.append(Pf.unpatchify(image[i], Ori_shape))
@@ -81,8 +78,6 @@ def swapaxes(X):
     X = torch.transpose(X, 1,-1)
     X = torch.transpose(X, 2,-1)
     gray = RgbToGrayscale()
-    #plt.imshow(gray(X)[0][0],cmap = 'gray')
-    #plt.show()
     return gray(X)
 
 def Deconstruct(Patches):
@@ -97,13 +92,11 @@ def Deconstruct(Patches):
     #Forced to use a train loader
     for N in range(len(Patches)): # N images
         for i in range (ss[1]): #How many Rows we have
-                #print('The i\'th run:', i)
                 for j in range (ss[2]): # How many Columns we have
                     img_new = np.asarray(Patches[N][0, i,j])
                     ndArr_X.append(img_new)
     ndArr_X = np.asarray(ndArr_X)
 
-    #print('Output has type:', type(ndArr_X), ' With the shape: ', ndArr_X.shape)
     return ndArr_X
 
 def Reconstruct(ndArr_X, Ori_PatchShape, N_img):
@@ -116,15 +109,12 @@ def Reconstruct(ndArr_X, Ori_PatchShape, N_img):
     Back_to_origianl = []
     for N in range (N_img):
         N_Image = np.zeros(Ori_PatchShape)
-        #print('This is N', N)
         Nr_image = N * N_Image.shape[1] * N_Image.shape[2]
         for i in range (N_Image.shape[1]):
             for j in range (N_Image.shape[2]):
                 index = (Nr_image+(i*N_Image.shape[1])+j)
-                #print('Index: ', index)
                 N_Image[0, i, j] = ndArr_X[index]
         Back_to_origianl.append(N_Image)
-    #print('Reconstructed: ', len(Back_to_origianl), 'Image patch arrays')
 
     return np.asarray(Back_to_origianl)
 
